@@ -65,6 +65,7 @@ function createMyApp() {
         title: TITLE,
         w: WIDTH * 2,
         h: HEIGHT * 2,
+        fullscreen: true,
       })
       this.win.on('close', () => {
         App.quit()
