@@ -143,18 +143,27 @@ function clearBg(offscreen: Uint8Array, hline0: number, hline1: number, x: numbe
 }
 
 function copyOffscreenToPixels(offscreen: Uint8Array, pixels: Uint8Array|Uint8ClampedArray,
-                               greyscale: boolean, palet: Uint8Array): void
+                               greyscale: boolean, emphasis: number, palet: Uint8Array): void
 {
   const n = Const.WIDTH * Const.HEIGHT
   let index = 0
   const colorMask = greyscale ? 0x20 : 0x3f
+
+  let rfactor = 1, gfactor = 1, bfactor =1
+  if ((emphasis & 1) !== 0)
+    gfactor = bfactor = 0.75
+  if ((emphasis & 2) !== 0)
+    rfactor = bfactor = 0.75
+  if ((emphasis & 4) !== 0)
+    rfactor = gfactor = 0.75
+
   for (let i = 0; i < n; ++i) {
     const pal = offscreen[i] & 0x1f
     const col = palet[pal] & colorMask
     const c = col * 3
-    pixels[index + 0] = kPaletColors[c]
-    pixels[index + 1] = kPaletColors[c + 1]
-    pixels[index + 2] = kPaletColors[c + 2]
+    pixels[index + 0] = kPaletColors[c] * rfactor
+    pixels[index + 1] = kPaletColors[c + 1] * gfactor
+    pixels[index + 2] = kPaletColors[c + 2] * bfactor
     index += 4
   }
 }
@@ -498,7 +507,8 @@ export class Ppu {
     }
 
     const greyscale = (this.regs[PpuReg.MASK] & GREYSCALE) !== 0
-    copyOffscreenToPixels(this.offscreen, pixels, greyscale, this.palet)
+    const emphasis = this.regs[PpuReg.MASK] >> 5
+    copyOffscreenToPixels(this.offscreen, pixels, greyscale, emphasis, this.palet)
   }
 
   public renderPatternTable(pixels: Uint8ClampedArray, lineWidth: number,
