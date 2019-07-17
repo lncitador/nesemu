@@ -7,6 +7,7 @@ import {IrqType} from '../cpu/cpu'
 import {Mapper, MapperOptions} from '../mapper/mapper'
 import Nes from '../nes'
 import {MirrorMode} from '../ppu/types'
+import Util from '../../util/util'
 
 // $402x: write-only registers
 const IRQ_RELOAD_L         = 0
@@ -100,6 +101,7 @@ export class Mapper020 extends Mapper {
   private nes: Nes
   private diskSideImages = new Array<Uint8Array>()
   private image?: Uint8Array
+  private side = 0
 
   private headPointer = 0
   private irqCounter = 0
@@ -119,6 +121,10 @@ export class Mapper020 extends Mapper {
 
     // BIOS ROM
     this.options.bus.setReadMemory(0xe000, 0xffff, (adr) => {
+      if (adr === 0xe445) {
+        this.detectRequestingSide()
+      }
+
       adr = adr | 0
       return this.biosData[adr - 0xe000] | 0
     })
@@ -166,7 +172,8 @@ export class Mapper020 extends Mapper {
       image = image.slice(16)
     }
     this.diskSideImages = loadFdsImage(image)
-    this.image = this.diskSideImages[0]
+    this.side = 0
+    this.image = this.diskSideImages[this.side]
     return true
   }
 
@@ -274,6 +281,9 @@ console.log(`IRQ!, repeat=${(this.regs[IRQ_CTRL] & IRQ_CTRL_REPEAT) !== 0}, next
       }
     case READ_DATA:
 // console.log(`READ_DATA: ${Util.hex(this.readData, 2)}, pointer=${Util.hex(this.headPointer, 4)}, CRC=${(this.regs[FDS_CTRL] & FDS_CTRL_CRC_CTRL) !== 0}`)
+if (this.headPointer === 0) {
+  console.log(`READ_DATA: 0`)
+}
       {
         let result = 0
         if ((this.regs[FDS_CTRL] & FDS_CTRL_READ) !== 0) {
@@ -348,6 +358,42 @@ console.log(`IRQ!, repeat=${(this.regs[IRQ_CTRL] & IRQ_CTRL_REPEAT) !== 0}, next
       break
     default:
       break
+    }
+  }
+
+  private detectRequestingSide() {
+    const bufferAddr = this.options.bus.read8(0) | (this.options.bus.read8(1) << 8)
+console.log(`Read 0xe445: (0x00)=${Util.hex(bufferAddr, 4)}`)
+    const buffer = new Uint8Array(10)
+    for (let i = 0; i < 10; ++i) {
+      if (bufferAddr + i !== 0xe445) {
+        buffer[i] = this.options.bus.read8(bufferAddr + i)
+      } else {
+        buffer[i] = 0
+      }
+    }
+console.log(Array.from(buffer).map(x => Util.hex(x, 2)).join(' '))
+
+    const OFFSET = 15
+    let matchCount = 0
+    let matchedSide = -1
+    for (let i = 0; i < this.diskSideImages.length; ++i) {
+      const header = this.diskSideImages[i]
+      let match = true
+console.log(`${i}: ${Array.from(Array(buffer.length).keys()).map(j => Util.hex(header[j + 15]))}`)
+      for (let j = 0; j < buffer.length; ++j) {
+        if (buffer[j] !== header[j + OFFSET] && buffer[j] !== 0xff) {
+          match = false
+          break
+        }
+      }
+      if (match) {
+        ++matchCount
+        matchedSide = i
+      }
+    }
+console.log(`Match: #${matchCount}, ${matchedSide}`)
+    if (matchCount === 1) {
     }
   }
 }
