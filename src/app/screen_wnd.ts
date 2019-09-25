@@ -390,6 +390,12 @@ export class ScreenWnd extends Wnd {
             },
           },
           {
+            label: 'Ram',
+            click: () => {
+              this.app.createRamWnd()
+            },
+          },
+          {
             label: 'Control',
             click: () => {
               this.app.createControlWnd()

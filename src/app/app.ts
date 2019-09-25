@@ -6,7 +6,7 @@ import {AudioManager} from '../util/audio_manager'
 import {Fds} from '../nes/fds/fds'
 import {FdsCtrlWnd} from './fds_ctrl_wnd'
 import {KeyCode} from '../util/key_code'
-import {RegisterWnd, TraceWnd, ControlWnd} from './debug_wnd'
+import {RegisterWnd, RamWnd, TraceWnd, ControlWnd} from './debug_wnd'
 import {FpsWnd, PaletWnd, NameTableWnd, PatternTableWnd, AudioWnd} from './other_wnd'
 import {ScreenWnd} from './screen_wnd'
 import StorageUtil from '../util/storage_util'
@@ -33,6 +33,7 @@ export const enum AppWndType {
   PATTERN,
   AUDIO,
   REGISTER,
+  RAM,
   TRACE,
   CONTROL,
   FPS,
@@ -294,6 +295,15 @@ export class App {
     this.wndMgr.add(registerWnd)
     registerWnd.setPos(410, 500)
     this.wndMap[AppWndType.REGISTER] = registerWnd
+    return true
+  }
+
+  public createRamWnd(): boolean {
+    if (this.wndMap[AppWndType.RAM] != null)
+      return false
+    const wnd = new RamWnd(this.wndMgr, this.nes, this.stream)
+    this.wndMgr.add(wnd)
+    this.wndMap[AppWndType.RAM] = wnd
     return true
   }
 
