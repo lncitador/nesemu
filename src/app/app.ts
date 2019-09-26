@@ -18,7 +18,8 @@ import * as Pubsub from '../util/pubsub'
 
 const CPU_HZ = 1789773
 const MAX_ELAPSED_TIME = 1000 / 15
-export const DEFAULT_MASTER_VOLUME = 0.125
+//export const DEFAULT_MASTER_VOLUME = 0.125
+export const DEFAULT_MASTER_VOLUME = 0.5
 
 export class Option {
   public title?: string
@@ -78,12 +79,14 @@ export class App {
     this.title = (option.title as string) || 'NES'
     this.screenWnd.setTitle(this.title)
 
-    const size = this.screenWnd.getWindowSize()
-    let x = Util.clamp((option.centerX || 0) - size.width / 2,
-                       0, window.innerWidth - size.width - 1)
-    let y = Util.clamp((option.centerY || 0) - size.height / 2,
-                       0, window.innerHeight - size.height - 1)
-    this.screenWnd.setPos(x, y)
+    //const size = this.screenWnd.getWindowSize()
+    //let x = Util.clamp((option.centerX || 0) - size.width / 2,
+    //                   0, window.innerWidth - size.width - 1)
+    //let y = Util.clamp((option.centerY || 0) - size.height / 2,
+    //                   0, window.innerHeight - size.height - 1)
+    //this.screenWnd.setPos(x, y)
+
+    this.screenWnd.setPos(10, 10)
   }
 
   protected handleAppEvent(type: AppEvent.Type, param?: any) {
@@ -151,6 +154,10 @@ export class App {
       this.createRegisterWnd()
       this.createControlWnd()
     }
+
+    this.createAudioWnd()
+    this.wndMap[AppWndType.AUDIO].setPos(256 + 12, 10)
+    this.wndMgr.moveToTop(this.screenWnd)
 
     return true
   }

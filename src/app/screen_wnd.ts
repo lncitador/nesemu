@@ -87,11 +87,11 @@ export class ScreenWnd extends Wnd {
   constructor(wndMgr: WindowManager, protected app: App, protected nes: Nes,
               protected stream: AppEvent.Stream)
   {
-    super(wndMgr, (WIDTH - HEDGE * 2) * 2, (HEIGHT - VEDGE * 2) * 2 + Wnd.MENUBAR_HEIGHT, 'NES')
+    super(wndMgr, (WIDTH - HEDGE * 2), (HEIGHT - VEDGE * 2) /*+ Wnd.MENUBAR_HEIGHT*/, 'NES')
     if (app == null || nes == null || stream == null)
       return
 
-    this.setUpMenuBar()
+    //this.setUpMenuBar()
     this.contentHolder.style.overflow = 'hidden'
 
     this.fullscreenBase = document.createElement('div')
@@ -121,8 +121,8 @@ export class ScreenWnd extends Wnd {
         }
       })
 
-    this.contentWidth = (WIDTH - HEDGE * 2) * 2
-    this.contentHeight = (HEIGHT - VEDGE * 2) * 2
+    this.contentWidth = (WIDTH - HEDGE * 2)
+    this.contentHeight = (HEIGHT - VEDGE * 2)
     this.updateContentSize(this.contentWidth, this.contentHeight)
   }
 

@@ -1,4 +1,4 @@
-$BG_COLOR: #ccc;
+$BG_COLOR: #ddd;
 
 html, body {
   width: 100%;
@@ -61,7 +61,7 @@ body {
 .wnd {
   background-color: gray;
   border: 1px solid #888;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  // box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   transition-duration: 0.1s;
   transition-property: box-shadow, width, height;
@@ -126,7 +126,7 @@ body {
   }
 }
 .wnd.top {
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, .8);
+  // box-shadow: 0px 0px 20px rgba(0, 0, 0, .8);
 
   .title-bar {
     background: linear-gradient(#eee, #aaa);
