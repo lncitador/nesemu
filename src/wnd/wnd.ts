@@ -261,6 +261,9 @@ export default class Wnd {
     this.addTitleButton(this.titleBtnHolder, 'maximize', () => {
       this.maximize()
     })
+    this.titleBar.addEventListener('dblclick', (_event) => {
+      this.maximize()
+    })
 
     const W = 8
 
