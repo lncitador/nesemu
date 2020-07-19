@@ -150,6 +150,7 @@ export default class Ppu {
   private scrollTemp: Word = 0
 
   private offscreen = new Uint8Array(Const.WIDTH * Const.HEIGHT)
+  private lastWritten: Byte = 0
 
   constructor() {
     // `palet` is part of `vram`, and shares its content using ArrayBuffer.
@@ -254,6 +255,8 @@ export default class Ppu {
   public read(reg: number): Byte {
     let result = this.regs[reg]
     switch (reg as PpuReg) {
+    case PpuReg.MASK:
+      return this.lastWritten
     case PpuReg.STATUS:
       this.regs[PpuReg.STATUS] &= ~PpuStatusBit.VBLANK
       this.latch = 0
@@ -289,6 +292,7 @@ export default class Ppu {
     }
 
     this.regs[reg] = value
+    this.lastWritten = value
 
     switch (reg as PpuReg) {
     case PpuReg.CTRL:
